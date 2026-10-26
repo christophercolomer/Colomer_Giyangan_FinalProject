@@ -1,10 +1,9 @@
-import 'package:flutter/foundational.dart';
+import 'package:flutter/foundation.dart';
 
 import '../models/task.dart';
 
-class TaskProvider with ChangeNotifier {
-
-}final List<Task> _tasks = [];
+class TaskProvider extends ChangeNotifier {
+  final List<Task> _tasks = [];
 
   List<Task> get tasks => List.unmodifiable(_tasks);
   List<Task> get pendingTasks => _tasks.where((t) => !t.isDone).toList();
@@ -75,3 +74,4 @@ class TaskProvider with ChangeNotifier {
     _tasks.removeWhere((t) => t.id == id);
     notifyListeners();
   }
+}
