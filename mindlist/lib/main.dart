@@ -2,17 +2,23 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import 'providers/task_provider.dart';
+import 'providers/weather_provider.dart';
 
 import 'app_routes.dart';
 import 'screens/bottom_nav.dart';
 import 'screens/task_detail_screen.dart';
-import 'screens/edit_task_screen.dart';
+import 'screens/add_edit_task_screen.dart';
 import 'screens/settings_screen.dart';
 
 void main() {
   runApp(
-    ChangeNotifierProvider(
-      create: (_) => TaskProvider(),
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => TaskProvider()),
+        ChangeNotifierProvider(
+          create: (_) => WeatherProvider()..loadForecast(),
+        ),
+      ],
       child: const MindList(),
     ),
   );

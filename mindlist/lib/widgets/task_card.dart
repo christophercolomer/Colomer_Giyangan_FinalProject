@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:intl/intl.dart';
 
 import '../app_routes.dart';
 import '../models/task.dart';
@@ -24,7 +25,9 @@ class TaskCard extends StatelessWidget {
             decoration: task.isDone ? TextDecoration.lineThrough : null,
           ),
         ),
-        subtitle: Text('${task.className} · ${task.priority.name} priority'),
+        subtitle: Text(
+          '${task.className} · ${DateFormat('MMM d').format(task.dueDate)} · ${task.priority.name}',
+        ),
         trailing: const Icon(Icons.chevron_right),
         onTap: () => Navigator.pushNamed(
           context,
