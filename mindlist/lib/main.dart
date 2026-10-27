@@ -1,22 +1,29 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import 'app_routes.dart';
+import 'providers/settings_provider.dart';
 import 'providers/task_provider.dart';
 import 'providers/weather_provider.dart';
-
-import 'app_routes.dart';
-import 'screens/bottom_nav.dart';
-import 'screens/task_detail_screen.dart';
 import 'screens/add_edit_task_screen.dart';
+import 'screens/bottom_nav.dart';
 import 'screens/settings_screen.dart';
+import 'screens/task_detail_screen.dart';
 
-void main() {
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  final settings = await SettingsProvider.load();
+
   runApp(
     MultiProvider(
       providers: [
+        ChangeNotifierProvider.value(value: settings),
         ChangeNotifierProvider(create: (_) => TaskProvider()),
-        ChangeNotifierProvider(
-          create: (_) => WeatherProvider()..loadForecast(),
+        // Gives WeatherProvider the chosen location, and again on every change.
+        ChangeNotifierProxyProvider<SettingsProvider, WeatherProvider>(
+          create: (_) => WeatherProvider(),
+          update: (_, settings, weather) =>
+              weather!..updateLocation(settings.location),
         ),
       ],
       child: const MindList(),
@@ -27,12 +34,21 @@ void main() {
 class MindList extends StatelessWidget {
   const MindList({super.key});
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
+    final themeMode = context.watch<SettingsProvider>().themeMode;
+    const seed = Colors.deepPurple;
+
     return MaterialApp(
       title: 'MindList',
-      theme: ThemeData(colorScheme: .fromSeed(seedColor: Colors.deepPurple)),
+      themeMode: themeMode,
+      theme: ThemeData(colorScheme: ColorScheme.fromSeed(seedColor: seed)),
+      darkTheme: ThemeData(
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: seed,
+          brightness: Brightness.dark,
+        ),
+      ),
       initialRoute: AppRoutes.home,
       routes: {
         AppRoutes.home: (_) => const BottomNav(initialIndex: 0),
