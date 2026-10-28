@@ -10,7 +10,7 @@ class WeatherProvider extends ChangeNotifier {
   final WeatherService _service;
 
   WeatherProvider({WeatherService? service})
-      : _service = service ?? WeatherService();
+    : _service = service ?? WeatherService();
 
   Location? _location;
   WeatherStatus _status = WeatherStatus.loading;
@@ -23,19 +23,15 @@ class WeatherProvider extends ChangeNotifier {
   Forecast? get forecast => _forecast;
   String? get errorMessage => _errorMessage;
 
-  // True when a failed refresh left us showing older data.
-  bool get isShowingStaleData =>
+  bool get isShowingOldData =>
       _forecast != null &&
       (_status == WeatherStatus.error || _status == WeatherStatus.offline);
 
-  // Called whenever Settings changes. Does nothing if the city is the same.
   void updateLocation(Location location) {
     if (location == _location) return;
     _location = location;
-    // Drop the old city's data so it is never shown under the new name.
     _forecast = null;
     _status = WeatherStatus.loading;
-    // Wait until the current build finishes before notifying listeners.
     Future.microtask(loadForecast);
   }
 
@@ -43,7 +39,6 @@ class WeatherProvider extends ChangeNotifier {
     final location = _location;
     if (location == null) return;
 
-    // If the user switches city mid-request, the older response is ignored.
     final requestId = ++_requestId;
     _status = WeatherStatus.loading;
     _errorMessage = null;
