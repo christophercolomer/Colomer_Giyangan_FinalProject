@@ -13,8 +13,6 @@ class SettingsProvider extends ChangeNotifier {
 
   SettingsProvider._(this._prefs, this._themeMode, this._location);
 
-  // Reads saved settings before the app starts, so the first frame
-  // already uses the right theme and location.
   static Future<SettingsProvider> load() async {
     final prefs = await SharedPreferences.getInstance();
     final themeName = prefs.getString(_themeKey);

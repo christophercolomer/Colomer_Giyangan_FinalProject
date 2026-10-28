@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import '../models/weather.dart';
 import '../providers/weather_provider.dart';
 import '../widgets/weather_card.dart';
+import '../app_routes.dart';
 
 class ForecastScreen extends StatelessWidget {
   const ForecastScreen({super.key});
@@ -18,6 +19,10 @@ class ForecastScreen extends StatelessWidget {
       appBar: AppBar(
         title: const Text('Forecast'),
         actions: [
+          IconButton(
+            icon: const Icon(Icons.settings),
+            onPressed: () => Navigator.pushNamed(context, AppRoutes.settings),
+          ),
           IconButton(
             icon: const Icon(Icons.refresh),
             onPressed: isLoading
@@ -49,7 +54,7 @@ class ForecastScreen extends StatelessWidget {
             padding: EdgeInsets.only(bottom: 12),
             child: LinearProgressIndicator(),
           ),
-        if (weather.isShowingStaleData)
+        if (weather.isShowingOldData)
           _StaleBanner(
             status: weather.status,
             message: weather.errorMessage ?? 'Could not refresh',
@@ -73,7 +78,6 @@ class ForecastScreen extends StatelessWidget {
   }
 }
 
-// Full-screen message with a retry button (no data to fall back on).
 class _ErrorView extends StatelessWidget {
   final WeatherStatus status;
   final String? message;
@@ -113,7 +117,6 @@ class _ErrorView extends StatelessWidget {
   }
 }
 
-// Shown above older data when a refresh fails.
 class _StaleBanner extends StatelessWidget {
   final WeatherStatus status;
   final String message;
@@ -128,7 +131,9 @@ class _StaleBanner extends StatelessWidget {
       color: scheme.errorContainer,
       child: ListTile(
         leading: Icon(
-          status == WeatherStatus.offline ? Icons.wifi_off : Icons.error_outline,
+          status == WeatherStatus.offline
+              ? Icons.wifi_off
+              : Icons.error_outline,
           color: scheme.onErrorContainer,
         ),
         title: Text(message, style: TextStyle(color: scheme.onErrorContainer)),
@@ -177,7 +182,7 @@ class _DayTile extends StatelessWidget {
       child: ListTile(
         leading: Icon(_icon(), size: 32),
         title: Text(_dayLabel()),
-        subtitle: Text(day.description),
+        subtitle: Text(day.desc),
         trailing: Text(
           '${day.tempMax.round()}° / ${day.tempMin.round()}°\n${day.rainChance}% rain',
           textAlign: TextAlign.end,

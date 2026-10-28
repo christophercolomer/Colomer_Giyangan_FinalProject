@@ -41,6 +41,7 @@ class MindList extends StatelessWidget {
 
     return MaterialApp(
       title: 'MindList',
+      debugShowCheckedModeBanner: false,
       themeMode: themeMode,
       theme: ThemeData(colorScheme: ColorScheme.fromSeed(seedColor: seed)),
       darkTheme: ThemeData(

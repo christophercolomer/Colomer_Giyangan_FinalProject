@@ -27,6 +27,7 @@ class Forecast {
     required this.daily,
   });
 
+  // Maps the Open-Meteo JSON into Dart objects.
   factory Forecast.fromJson(Map<String, dynamic> json) {
     final current = json['current'] as Map<String, dynamic>;
     final daily = json['daily'] as Map<String, dynamic>;
@@ -48,6 +49,7 @@ class Forecast {
           rainChance: (rain[i] as num?)?.round() ?? 0,
         ),
     ];
+
     if (days.isEmpty) throw const FormatException('No daily forecast data');
 
     return Forecast(
@@ -56,8 +58,10 @@ class Forecast {
       daily: days,
     );
   }
+
   int get todayRainChance => daily.first.rainChance;
 
+  // Suggestion shown on the Home weather card.
   String get tip {
     if (todayRainChance >= 60) {
       return 'Bring an umbrella';
@@ -65,13 +69,14 @@ class Forecast {
     if (todayRainChance >= 30) {
       return 'Rain is possible. Pack an umbrella just in case';
     }
-    if (currentTemp >= 33) {
-      return 'Very hot. Bring water';
+    if (currentTemp >= 33) return 'Very hot. Bring water';
+    {
+      return 'Good weather for getting around';
     }
-    return 'Good weather for getting around';
   }
 }
 
+// Converts Open-Meteo's WMO weather codes into readable text.
 String describeWeatherCode(int code) {
   if (code == 0) return 'Clear sky';
   if (code <= 3) return 'Partly cloudy';
