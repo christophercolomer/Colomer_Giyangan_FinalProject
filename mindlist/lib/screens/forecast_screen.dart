@@ -38,7 +38,6 @@ class ForecastScreen extends StatelessWidget {
   Widget _body(BuildContext context, WeatherProvider weather) {
     final forecast = weather.forecast;
 
-    // Nothing to show yet: first load, or a failure with no older data.
     if (forecast == null) {
       if (weather.status == WeatherStatus.loading) {
         return const Center(child: CircularProgressIndicator());
