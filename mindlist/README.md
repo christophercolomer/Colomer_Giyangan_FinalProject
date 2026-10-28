@@ -1,105 +1,113 @@
-# RainCheck: Class-Day Planner with Weather
+# MindList
 
-> TODO: replace "RainCheck" everywhere if you pick a different app name.
-
-A Flutter mobile app that helps students manage class tasks and deadlines while keeping an eye on the day's weather. It shows a daily forecast and suggests what to prepare for, such as bringing an umbrella or leaving earlier.
-
-Final Project for **SE2142 Software Engineering Tools and Practices**, BSSE 2.
-
-## Screenshots
-
-> TODO: add real screenshots to `docs/screenshots/` and keep the paths below in sync.
-
-| Today | Task list | Add / edit task |
-| --- | --- | --- |
-| ![Today](docs/screenshots/today.png) | ![Task list](docs/screenshots/task_list.png) | ![Add task](docs/screenshots/add_task.png) |
-
-| Task detail | Forecast | Settings |
-| --- | --- | --- |
-| ![Task detail](docs/screenshots/task_detail.png) | ![Forecast](docs/screenshots/forecast.png) | ![Settings](docs/screenshots/settings.png) |
+A Flutter mobile app that helps students manage class tasks and deadlines while keeping an eye on the day's weather. Tasks and a live forecast share one screen, so students can see what is due and how to prepare for it at the same time.
 
 ## Problem and target users
 
-Students juggle deadlines, classes, and commutes in separate places. A missed deadline or an unexpected downpour can cost grades or a whole day, and no single app connects the two. RainCheck is for college students, especially those who commute.
+Students keep deadlines in one place and check the weather in another. Because the two never meet, it is easy to miss a task or get caught in the rain on the way to class, and a missed submission or a late arrival costs grades and time. MindList is for college students, especially those who commute.
 
 ## Features
 
-- Add, view, edit, complete, and delete class tasks (full CRUD)
-- Today screen with pending tasks and a current-weather summary
-- Weather-based suggestions (umbrella, leave earlier, outdoor tasks may need rescheduling)
-- Multi-day forecast from a live REST API
-- Filters for pending and completed tasks
-- Form validation on add/edit
-- Empty states, loading indicators, and failed-request messages
-- Offline handling that shows the last saved forecast
-- Custom app icon and splash screen
-
-> TODO: remove anything you don't actually finish. Every feature listed here must be demonstrable in the live demo.
+- Add, edit, complete, and delete class tasks (full CRUD)
+- Task form with validation (required title and class, required due date)
+- Task list with status filters (All, Pending, Done) and due-date filters (Any date, Today, Next 7 days, Overdue)
+- Today screen with tasks due today and the current weather with a short tip
+- 7-day forecast from a live REST API, with loading, error, and offline states and a retry button
+- If a refresh fails, the last loaded forecast stays on screen with a warning banner
+- Location picker for the forecast, saved on the device
+- Light and dark theme toggle, saved on the device
+- Empty states on Home, Task list, and Task detail
 
 ## Tech stack
 
-| Item | Choice |
-| --- | --- |
-| Framework | Flutter |
-| Language | Dart |
-| Platform | Android |
-| State management | Provider (`ChangeNotifier`) |
-| API | [Open-Meteo](https://open-meteo.com/) forecast API (free, no API key) |
+| Item             | Choice                                                                |
+| ---------------- | --------------------------------------------------------------------- |
+| Framework        | Flutter                                                               |
+| Language         | Dart                                                                  |
+| Platform         | Android                                                               |
+| State management | Provider (`ChangeNotifier`)                                           |
+| API              | [Open-Meteo](https://open-meteo.com/) forecast API (free, no API key) |
 
 ## Packages used
 
-> TODO: update this list to match your final `pubspec.yaml`.
-
-| Package | Purpose |
-| --- | --- |
-| `provider` | Shared app state |
-| `http` | REST API calls |
-| `intl` | Date formatting |
-| `shared_preferences` | Saving settings and the last forecast for offline use |
-| `connectivity_plus` | Detecting no-internet state |
-| `flutter_launcher_icons` | Custom app icon |
-| `flutter_native_splash` | Splash screen |
+| Package              | Purpose                              |
+| -------------------- | ------------------------------------ |
+| `provider`           | Shared app state                     |
+| `http`               | REST API calls                       |
+| `intl`               | Date formatting                      |
+| `shared_preferences` | Saving the chosen location and theme |
 
 ## Project structure
 
 ```
 lib/
-  main.dart            # App entry point, theme, named routes
-  models/              # Task, Forecast (JSON parsing)
-  providers/           # TaskProvider, WeatherProvider
-  services/            # WeatherService (http calls)
-  screens/             # Home, TaskList, TaskDetail, AddEditTask, Forecast, Settings
-  widgets/             # Reusable widgets (TaskCard, WeatherCard, EmptyState, ...)
+  main.dart              # Providers, theme, named route map
+  app_routes.dart        # Route name constants
+  models/                # task.dart, weather.dart, location.dart
+  providers/             # task_provider.dart, weather_provider.dart, settings_provider.dart
+  services/              # weather_service.dart (all http calls)
+  screens/               # bottom_nav, home, task_list, task_detail,
+                         # add_edit_task, forecast, settings
+  widgets/               # task_card, weather_card, empty_state
 ```
 
-> TODO: adjust the folder contents to match your repo.
+## Navigation
+
+Named routes are registered in `lib/main.dart`, and the names live in `lib/app_routes.dart`.
+
+| Route           | Screen                                                    |
+| --------------- | --------------------------------------------------------- |
+| `/home`         | Today tab (inside `BottomNav`)                            |
+| `/tasks`        | Task list tab (inside `BottomNav`)                        |
+| `/forecast`     | Forecast tab (inside `BottomNav`)                         |
+| `/tasks/detail` | Task detail (receives the task id as an argument)         |
+| `/tasks/add`    | Add / edit task (an id argument switches it to edit mode) |
+| `/settings`     | Settings                                                  |
+
+The three tabs share one `BottomNav` widget, which switches screens by changing an index. Detail, add/edit, and settings open on top with `Navigator.pushNamed`.
 
 ## API
 
-RainCheck uses the Open-Meteo forecast endpoint:
+MindList uses the Open-Meteo forecast endpoint:
 
 ```
 GET https://api.open-meteo.com/v1/forecast
     ?latitude={lat}&longitude={lon}
-    &daily=weather_code,temperature_2m_max,precipitation_probability_max
-    &timezone=auto
+    &current=temperature_2m,weather_code
+    &daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max
+    &timezone=auto&forecast_days=7
 ```
 
-The JSON response is parsed into a `Forecast` model in `lib/models/`, and `WeatherProvider` exposes loading, success, and error states to the UI.
+Sample (trimmed) response:
+
+```json
+{
+  "current": { "temperature_2m": 29.1, "weather_code": 3 },
+  "daily": {
+    "time": ["2026-10-26", "2026-10-27"],
+    "weather_code": [80, 3],
+    "temperature_2m_max": [31.2, 32.0],
+    "temperature_2m_min": [25.4, 25.9],
+    "precipitation_probability_max": [70, 20]
+  }
+}
+```
+
+`lib/services/weather_service.dart` makes the request and turns failures into typed exceptions. `lib/models/weather.dart` parses the JSON into `Forecast` and `DailyForecast`. `lib/providers/weather_provider.dart` exposes the loading, success, error, and offline states to the screens.
 
 ## Setup and run
 
 ### Requirements
 
-- Flutter SDK (run `flutter --version` and note the version here: TODO)
+- Flutter SDK Flutter 3.47.2
 - Android Studio or VS Code with the Flutter extension
-- An Android emulator or a physical Android device
+- An Android emulator or a physical Android device with internet access
 
 ### Steps
 
 ```bash
-git clone https://github.com/TODO-username/TODO-repo.git
-cd TODO-repo
+git clone https://github.com/christophercolomer/Colomer_Giyangan_FinalProject
+cd repo
 flutter pub get
 flutter run
 ```
@@ -113,44 +121,33 @@ dart format .
 
 ### Build the release APK
 
+The app needs this line in `android/app/src/main/AndroidManifest.xml`, above the `<application` tag. Debug builds add internet access automatically, but a release build fails every API call without it:
+
+```xml
+<uses-permission android:name="android.permission.INTERNET" />
+```
+
+Then build:
+
 ```bash
 flutter build apk --release
 ```
 
-The APK is generated at `build/app/outputs/flutter-apk/app-release.apk`.
-
-> TODO: document how you set up the app icon and splash screen (for example, the `flutter_launcher_icons` and `flutter_native_splash` commands you ran) and what changed between your debug and release builds.
+The APK is created at `build/app/outputs/flutter-apk/app-release.apk`.
 
 ## Team
 
-| Member | Role and responsibilities | GitHub |
-| --- | --- | --- |
-| Christopher Colomer | TODO (for example: UI lead, Git/repo manager) | @TODO |
-| TODO | TODO | @TODO |
+Members:
 
-## Workflow
-
-- Branches follow `feature/<name>` (for example, `feature/api-service`) and are merged into `main` through pull requests with review comments.
-- Tasks are planned and assigned with GitHub Issues / the Projects board.
-
-> TODO: add links to your Projects board and a few example pull requests once they exist.
-
-## Debugging case
-
-> TODO: fill this in with a real bug your team found. The rubric needs the bug, how you found it, and the fix. Do not invent one; write it up when it happens and take the screenshot then.
-
-**Bug:** what went wrong, as a user would see it.
-
-**How we found it:** which tool you used (Flutter DevTools inspector or debugger, hot reload/restart, or reading a stack trace), with a screenshot in `docs/screenshots/`.
-
-**Fix:** what you changed, in which file, and why it works.
+1. Christopher Colomer
+2. Jeremy Don Giyangan
 
 ## References
-
-> TODO: list every package, API, tutorial, documentation page, and AI tool you used. The course requires proper citations, including AI tools.
 
 - [Flutter documentation](https://docs.flutter.dev/)
 - [Dart documentation](https://dart.dev/guides)
 - [Open-Meteo API docs](https://open-meteo.com/en/docs)
-- [Provider package](https://pub.dev/packages/provider)
-- [http package](https://pub.dev/packages/http)
+- [provider](https://pub.dev/packages/provider)
+- [http](https://pub.dev/packages/http)
+- [intl](https://pub.dev/packages/intl)
+- [shared_preferences](https://pub.dev/packages/shared_preferences)

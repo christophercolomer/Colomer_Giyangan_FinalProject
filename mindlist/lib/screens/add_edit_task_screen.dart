@@ -18,12 +18,10 @@ class _AddEditTaskScreenState extends State<AddEditTaskScreen> {
   final _classController = TextEditingController();
   DateTime? _dueDate;
   Priority _priority = Priority.medium;
-  String? _editingId; // null = adding, set = editing
+  String? _editingId;
   bool _loaded = false;
   bool _dateError = false;
 
-  // Runs once the route arguments are available. If a task id was passed,
-  // switch to edit mode and pre-fill the form.
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
@@ -113,7 +111,8 @@ class _AddEditTaskScreenState extends State<AddEditTaskScreen> {
               validator: (v) {
                 final text = v?.trim() ?? '';
                 if (text.isEmpty) return 'Enter a title';
-                if (text.length < 3) return 'Title must be at least 3 characters';
+                if (text.length < 3)
+                  return 'Title must be at least 3 characters';
                 return null;
               },
             ),

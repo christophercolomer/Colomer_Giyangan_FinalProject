@@ -60,7 +60,6 @@ class HomeScreen extends StatelessWidget {
   }
 }
 
-// Shown on Home until the forecast has loaded, or if it failed.
 class _WeatherPlaceholder extends StatelessWidget {
   final WeatherStatus status;
   final String? message;

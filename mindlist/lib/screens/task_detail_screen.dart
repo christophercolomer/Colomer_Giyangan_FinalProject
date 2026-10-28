@@ -36,7 +36,6 @@ class TaskDetailScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // The list passes the task's id; look the task up so we always show fresh data.
     final id = ModalRoute.of(context)!.settings.arguments as String;
     final task = context.watch<TaskProvider>().findById(id);
 
@@ -76,13 +75,21 @@ class TaskDetailScreen extends StatelessWidget {
         children: [
           Text(task.title, style: Theme.of(context).textTheme.headlineSmall),
           const SizedBox(height: 16),
-          _InfoRow(icon: Icons.school_outlined, label: 'Class', value: task.className),
+          _InfoRow(
+            icon: Icons.school_outlined,
+            label: 'Class',
+            value: task.className,
+          ),
           _InfoRow(
             icon: Icons.event,
             label: 'Due',
             value: DateFormat('EEE, MMM d, y').format(task.dueDate),
           ),
-          _InfoRow(icon: Icons.flag_outlined, label: 'Priority', value: priorityLabel),
+          _InfoRow(
+            icon: Icons.flag_outlined,
+            label: 'Priority',
+            value: priorityLabel,
+          ),
           _InfoRow(
             icon: Icons.check_circle_outline,
             label: 'Status',
@@ -109,7 +116,11 @@ class _InfoRow extends StatelessWidget {
   final String label;
   final String value;
 
-  const _InfoRow({required this.icon, required this.label, required this.value});
+  const _InfoRow({
+    required this.icon,
+    required this.label,
+    required this.value,
+  });
 
   @override
   Widget build(BuildContext context) {
