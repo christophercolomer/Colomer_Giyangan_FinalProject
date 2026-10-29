@@ -161,4 +161,7 @@ Members:
 ![Task Detail Screen](screenshots/taskdetailscreen.png)
 ![Settings Screen](screenshots/settingsscreen.png)
 
+## Bug
 
+I clicked on a task card and the red screen with error scared me for a bit but the error gave a pretty big hint and I figured it out on my own. Turns out I was passing the whole task object as an argument in .pushNamed in task_card.dart, when only the task.id was expected.
+![error](screenshots/errorflutterbug.png)
