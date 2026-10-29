@@ -111,8 +111,9 @@ class _AddEditTaskScreenState extends State<AddEditTaskScreen> {
               validator: (v) {
                 final text = v?.trim() ?? '';
                 if (text.isEmpty) return 'Enter a title';
-                if (text.length < 3)
+                if (text.length < 3) {
                   return 'Title must be at least 3 characters';
+                }
                 return null;
               },
             ),

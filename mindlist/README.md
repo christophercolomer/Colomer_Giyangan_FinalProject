@@ -151,3 +151,14 @@ Members:
 - [http](https://pub.dev/packages/http)
 - [intl](https://pub.dev/packages/intl)
 - [shared_preferences](https://pub.dev/packages/shared_preferences)
+
+## Screenshots
+
+![Default Flutter App](screenshots/defaultflutterapp.png)
+![Home Screen](screenshots/homescreen.png)
+![Task List screen](screenshots/tasklistscreen.png)
+![Forecast Screen](screenshots/forecastscreen.png)
+![Task Detail Screen](screenshots/taskdetailscreen.png)
+![Settings Screen](screenshots/settingsscreen.png)
+
+
